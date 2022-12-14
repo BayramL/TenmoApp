@@ -44,6 +44,17 @@ public class JdbcUserDao implements UserDao {
         return users;
     }
 
+    public List<User> findAllBut(User user) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE user_id != ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user.getId());
+        while(results.next()) {
+            User user1 = mapRowToUser(results);
+            users.add(user1);
+        }
+        return users;
+    }
+
     @Override
     public User findByUsername(String username) throws UsernameNotFoundException {
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE username ILIKE ?;";
@@ -68,6 +79,9 @@ public class JdbcUserDao implements UserDao {
         }
 
         // TODO: Create the account record with initial balance
+        String sql2 = "INSERT INTO account (user_id, balance) " +
+                "VALUES (?, 1000.0)";
+        jdbcTemplate.update(sql2, newUserId);
 
         return true;
     }
