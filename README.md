@@ -60,7 +60,7 @@ If you complete all of the required and challenge use cases and are looking for 
 
 ## How to set up the database
 
-Create a new Postgres database called `tenmo`. Run the `database/tenmo.sql` script in pgAdmin to set up the database that you'll begin to work from. You should make structure changes in this script and not the database directly. Additionally, both you and your team members need to run this script each time after making changes to it. 
+Create a new Postgres database called `tenmodb`. Run the `database/tenmo.sql` script in pgAdmin to set up the database that you'll begin to work from. You should make structure changes in this script and not the database directly. Additionally, both you and your team members need to run this script each time after making changes to it. 
 
 ## Database schema
 
