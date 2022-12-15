@@ -38,14 +38,33 @@ public class TransferController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(path = "/send/{receiverId}/{transferAmount}", method = RequestMethod.POST)
-    public boolean createSendTransfer(@PathVariable int receiverId, @PathVariable BigDecimal transferAmount, Principal principal) {
+    @RequestMapping(path = "/send", method = RequestMethod.POST)
+    public boolean createSendTransfer(@RequestBody Transfer transfer, Principal principal) {
+        int receiverId = transfer.getReceiverId();
+        BigDecimal transferAmount = transfer.getTransferAmount();
         return transferDao.createSend(userDao.findByUsername(principal.getName()), receiverId, transferAmount);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @RequestMapping(path = "/request/{senderId}/{transferAmount}", method = RequestMethod.POST)
-    public boolean createRequestTransfer(@PathVariable int senderId, @PathVariable BigDecimal transferAmount, Principal principal) {
-        return transferDao.createRequest(userDao.findByUsername(principal.getName()), senderId, transferAmount);
+    @RequestMapping(path = "/request", method = RequestMethod.POST)
+    public boolean createRequestTransfer(@RequestBody Transfer transfer, Principal principal) {
+        int senderId = transfer.getSenderId();
+        return transferDao.createRequest(userDao.findByUsername(principal.getName()), senderId, transfer.getTransferAmount());
     }
+
+    @RequestMapping(path = "/request/pending", method = RequestMethod.GET)
+    public List<Transfer> getPendingTransfers(Principal principal) {
+        return transferDao.getPendingTransfers(userDao.findByUsername(principal.getName()));
+    }
+
+    @RequestMapping(path = "/request/accept/{transferId}", method = RequestMethod.PUT)
+    public boolean acceptPendingTransfer(Principal principal, int transferId) {
+        return transferDao.acceptRequest(userDao.findByUsername(principal.getName()), transferId);
+    }
+
+    @RequestMapping(path = "/request/reject/{transferId}", method = RequestMethod.PUT)
+    public void rejectPendingTransfer(Principal principal, int transferId) {
+        transferDao.rejectRequest(userDao.findByUsername(principal.getName()), transferId);
+    }
+
 }

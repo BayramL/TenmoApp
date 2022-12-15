@@ -16,5 +16,10 @@ public interface TransferDao {
 
     boolean createRequest(User user, int senderId, BigDecimal transferAmount);
 
+    List<Transfer> getPendingTransfers(User user);
+
+    boolean acceptRequest(User user, int transactionId);
+
+    void rejectRequest(User user, int transactionId);
 
 }

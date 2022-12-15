@@ -64,14 +64,56 @@ public class JdbcTransferDao implements TransferDao{
             }
         }
         String sql = "INSERT INTO transfer (sender_id, receiver_id, transfer_date, transfer_amount, transfer_type, transfer_status) " +
-                "VALUES (?, ?, NOW(), ?, 'send', 'Approved')";
+                "VALUES (?, ?, NOW(), ?, 'Send', 'Approved')";
         return jdbcTemplate.update(sql, user.getId(), receiverId, transferAmount) == 1;
     }
 
     public boolean createRequest(@Valid User user, int senderId, BigDecimal transferAmount) {
         String sql = "INSERT INTO transfer (sender_id, receiver_id, transfer_date, transfer_amount, transfer_type, transfer_status) " +
-                "VALUES (?, ?, NOW(), ?, 'send', 'Rejected')";
+                "VALUES (?, ?, NOW(), ?, 'Request', 'Pending')";
         return jdbcTemplate.update(sql, senderId, user.getId(), transferAmount) == 1;
+    }
+
+    public List<Transfer> getPendingTransfers(User user) {
+        List<Transfer> list = new ArrayList<>();
+        String sql = "SELECT (transfer_id, sender_id, receiver_id, transfer_date, transfer_amount, transfer_type, transfer_status) " +
+                "FROM transfer WHERE sender_id = ? AND transfer_status = 'Pending';";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user.getId());
+        while (results.next()) {
+            list.add(mapToTransfer(results));
+        }
+        return list;
+    }
+
+    public boolean acceptRequest(User user, int transactionId) {
+        String sql1 = "SELECT balance FROM account WHERE user_id = ?;";
+        SqlRowSet result = jdbcTemplate.queryForRowSet(sql1, user.getId());
+        String sql2 = "SELECT transfer_amount, receiver_id FROM transfer WHERE transfer_id = ?";
+        SqlRowSet result2 = jdbcTemplate.queryForRowSet(sql2, transactionId);
+        if (result.next() && result2.next()) {
+            BigDecimal balance = result.getBigDecimal("balance");
+            BigDecimal transferAmount = result2.getBigDecimal("transfer_amount");
+            int receiverId = result2.getInt("receiver_id");
+            if (balance.compareTo(transferAmount) >= 0) {
+                // add the money and stuff...
+                String removeMoneyFromSender = "UPDATE account SET balance = balance - ? WHERE user_id = ?";
+                jdbcTemplate.update(removeMoneyFromSender, transferAmount, user.getId());
+                String addMoneyToReceiver = "UPDATE account SET balance = balance + ? WHERE user_id = ?";
+                jdbcTemplate.update(addMoneyToReceiver, transferAmount, receiverId);
+                String lastSql = "UPDATE transfer SET transfer_status = 'Approved' WHERE transfer_id = ?";
+                jdbcTemplate.update(lastSql, transactionId);
+            }
+            else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void rejectRequest(User user, int transactionId) {
+        String sql = "UPDATE transfer SET transfer_status = 'Rejected' WHERE transfer_id = ?";
+        jdbcTemplate.update(sql, transactionId);
     }
 
     public Transfer mapToTransfer(SqlRowSet result) {
