@@ -76,8 +76,8 @@ public class JdbcTransferDao implements TransferDao{
 
     public List<Transfer> getPendingTransfers(User user) {
         List<Transfer> list = new ArrayList<>();
-        String sql = "SELECT (transfer_id, sender_id, receiver_id, transfer_date, transfer_amount, transfer_type, transfer_status) " +
-                "FROM transfer WHERE sender_id = ? AND transfer_status = 'Pending';";
+        String sql = "SELECT transfer_id, sender_id, receiver_id, transfer_date, transfer_amount, transfer_type, transfer_status " +
+                     "FROM transfer WHERE sender_id = ? AND transfer_status = 'Pending'";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sql, user.getId());
         while (results.next()) {
             list.add(mapToTransfer(results));
@@ -96,12 +96,14 @@ public class JdbcTransferDao implements TransferDao{
             int receiverId = result2.getInt("receiver_id");
             if (balance.compareTo(transferAmount) >= 0) {
                 // add the money and stuff...
-                String removeMoneyFromSender = "UPDATE account SET balance = balance - ? WHERE user_id = ?";
-                jdbcTemplate.update(removeMoneyFromSender, transferAmount, user.getId());
-                String addMoneyToReceiver = "UPDATE account SET balance = balance + ? WHERE user_id = ?";
-                jdbcTemplate.update(addMoneyToReceiver, transferAmount, receiverId);
-                String lastSql = "UPDATE transfer SET transfer_status = 'Approved' WHERE transfer_id = ?";
-                jdbcTemplate.update(lastSql, transactionId);
+                String removeMoneyFromSender = "BEGIN TRANSACTION; UPDATE account SET balance = balance - ? WHERE user_id = ?; " +
+                        "UPDATE account SET balance = balance + ? WHERE user_id = ?; " +
+                        "UPDATE transfer SET transfer_status = 'Approved' WHERE transfer_id = ?; COMMIT;";
+                jdbcTemplate.update(removeMoneyFromSender, transferAmount, user.getId(), transferAmount, receiverId, transactionId);
+//                String addMoneyToReceiver = "UPDATE account SET balance = balance + ? WHERE user_id = ?";
+//                jdbcTemplate.update(addMoneyToReceiver, transferAmount, receiverId);
+//                String lastSql = "UPDATE transfer SET transfer_status = 'Approved' WHERE transfer_id = ?";
+//                jdbcTemplate.update(lastSql, transactionId);
             }
             else {
                 return false;

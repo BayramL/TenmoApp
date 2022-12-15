@@ -58,12 +58,12 @@ public class TransferController {
     }
 
     @RequestMapping(path = "/request/accept/{transferId}", method = RequestMethod.PUT)
-    public boolean acceptPendingTransfer(Principal principal, int transferId) {
+    public boolean acceptPendingTransfer(Principal principal, @PathVariable int transferId) {
         return transferDao.acceptRequest(userDao.findByUsername(principal.getName()), transferId);
     }
 
     @RequestMapping(path = "/request/reject/{transferId}", method = RequestMethod.PUT)
-    public void rejectPendingTransfer(Principal principal, int transferId) {
+    public void rejectPendingTransfer(Principal principal, @PathVariable int transferId) {
         transferDao.rejectRequest(userDao.findByUsername(principal.getName()), transferId);
     }
 

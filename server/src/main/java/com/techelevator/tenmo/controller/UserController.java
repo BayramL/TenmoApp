@@ -23,7 +23,7 @@ public class UserController {
         return userDao.findAll();
     }
 
-    @RequestMapping(path = "available", method = RequestMethod.GET)
+    @RequestMapping(path = "/available", method = RequestMethod.GET)
     public List<User> listAllBut(Principal principal) {
         return userDao.findAllBut(userDao.findByUsername(principal.getName()));
     }

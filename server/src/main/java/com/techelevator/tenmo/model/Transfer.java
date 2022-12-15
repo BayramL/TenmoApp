@@ -17,30 +17,6 @@ public class Transfer {
 
     public Transfer() {}
 
-    public String getTransferType() {
-        return transferType;
-    }
-
-    public void setTransferType(String transferType) {
-        this.transferType = transferType;
-    }
-
-    public String getTransferStatus() {
-        return transferStatus;
-    }
-
-    public void setTransferStatus(String transferStatus) {
-        this.transferStatus = transferStatus;
-    }
-
-    public BigDecimal getTransferAmount() {
-        return transferAmount;
-    }
-
-    public void setTransferAmount(BigDecimal transferAmount) {
-        this.transferAmount = transferAmount;
-    }
-
     public int getTransferId() {
         return transferId;
     }
@@ -65,11 +41,35 @@ public class Transfer {
         this.receiverId = receiverId;
     }
 
+    public BigDecimal getTransferAmount() {
+        return transferAmount;
+    }
+
+    public void setTransferAmount(BigDecimal transferAmount) {
+        this.transferAmount = transferAmount;
+    }
+
     public LocalDate getTransferDate() {
         return transferDate;
     }
 
-    public void setTransferDate(LocalDate transferTime) {
-        this.transferDate = transferTime;
+    public void setTransferDate(LocalDate transferDate) {
+        this.transferDate = transferDate;
+    }
+
+    public String getTransferType() {
+        return transferType;
+    }
+
+    public void setTransferType(String transferType) {
+        this.transferType = transferType;
+    }
+
+    public String getTransferStatus() {
+        return transferStatus;
+    }
+
+    public void setTransferStatus(String transferStatus) {
+        this.transferStatus = transferStatus;
     }
 }
