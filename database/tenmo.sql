@@ -45,7 +45,7 @@ CREATE TABLE transfer (
 	transfer_date date NOT NULL,
 	transfer_amount numeric(13, 2) NOT NULL,
 	transfer_type varchar(20) NOT NULL,
-	transfer_status boolean,
+	transfer_status varchar(50) NOT NULL,
 	CONSTRAINT PK_transfer PRIMARY KEY (transfer_id),
 	CONSTRAINT CHK_sender_receiver_not_same CHECK (sender_id != receiver_id),
 	CONSTRAINT FK_sender_id FOREIGN KEY(sender_id) REFERENCES tenmo_user(user_id),

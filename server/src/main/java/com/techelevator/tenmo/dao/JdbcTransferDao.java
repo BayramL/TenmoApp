@@ -94,12 +94,12 @@ public class JdbcTransferDao implements TransferDao{
             BigDecimal balance = result.getBigDecimal("balance");
             BigDecimal transferAmount = result2.getBigDecimal("transfer_amount");
             int receiverId = result2.getInt("receiver_id");
-            if (balance.compareTo(transferAmount) >= 0) {
+            if (balance.compareTo(transferAmount) >= 0 && balance.compareTo(new BigDecimal("0")) == 0) {
                 // add the money and stuff...
-                String removeMoneyFromSender = "BEGIN TRANSACTION; UPDATE account SET balance = balance - ? WHERE user_id = ?; " +
+                String sql3 = "BEGIN TRANSACTION; UPDATE account SET balance = balance - ? WHERE user_id = ?; " +
                         "UPDATE account SET balance = balance + ? WHERE user_id = ?; " +
                         "UPDATE transfer SET transfer_status = 'Approved' WHERE transfer_id = ?; COMMIT;";
-                jdbcTemplate.update(removeMoneyFromSender, transferAmount, user.getId(), transferAmount, receiverId, transactionId);
+                jdbcTemplate.update(sql3, transferAmount, user.getId(), transferAmount, receiverId, transactionId);
 //                String addMoneyToReceiver = "UPDATE account SET balance = balance + ? WHERE user_id = ?";
 //                jdbcTemplate.update(addMoneyToReceiver, transferAmount, receiverId);
 //                String lastSql = "UPDATE transfer SET transfer_status = 'Approved' WHERE transfer_id = ?";

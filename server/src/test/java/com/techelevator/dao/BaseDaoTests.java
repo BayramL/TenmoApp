@@ -1,6 +1,7 @@
 package com.techelevator.dao;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,5 +24,6 @@ public abstract class BaseDaoTests {
     public void rollback() throws SQLException {
         dataSource.getConnection().rollback();
     }
+
 
 }

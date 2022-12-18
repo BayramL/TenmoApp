@@ -9,8 +9,9 @@ import org.junit.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
+import java.util.List;
 
-public class JdbcUserDaoTests extends BaseDaoTests{
+public class JdbcUserDaoTests extends BaseDaoTests {
 
     private JdbcUserDao sut;
 
@@ -27,5 +28,15 @@ public class JdbcUserDaoTests extends BaseDaoTests{
         User user = sut.findByUsername("TEST_USER");
         Assert.assertEquals("TEST_USER", user.getUsername());
     }
+
+    @Test
+    public void listAllBut_lists_all_but_logged_in_user() {
+        sut.create("TestUser", "123");
+        User testUser = sut.findByUsername("TestUser");
+        List<User> list = sut.findAllBut(testUser);
+        Assert.assertEquals(2, list.size());
+    }
+
+
 
 }
